@@ -1,23 +1,29 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 interface RootProvidersProps {
   children: ReactNode;
 }
 
 const RootProviders: FC<RootProvidersProps> = ({ children }) => {
+  const [queryClient] = useState(() => new QueryClient());
   return (
     <>
-      <ThemeProvider
-        attribute={"class"}
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          attribute={"class"}
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </>
   );
 };

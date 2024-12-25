@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Tilt_Neon } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Fintrack",
@@ -29,6 +30,7 @@ export default function RootLayout({
     >
       <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
         <body className={title_neon.className}>
+          <Toaster position="top-right" richColors={true} />
           <RootProviders>{children}</RootProviders>
         </body>
       </html>
