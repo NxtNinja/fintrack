@@ -63,8 +63,8 @@ const MobileNavbar = () => {
 const DesktopNavbar = () => {
   return (
     <>
-      <div className="hidden md:block w-screen">
-        <nav className="container flex items-center justify-between px-8 mx-auto border-separate border-b bg-background">
+      <div className="hidden md:block w-screen border-separate border-b bg-background">
+        <nav className="container flex items-center justify-between px-8 mx-auto ">
           <div className="flex h-[80px] min-h-[60px] items-center gap-x-4">
             <div className="text-2xl font-bold tracking-widest uppercase">
               Fintrack
