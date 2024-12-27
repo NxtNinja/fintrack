@@ -41,12 +41,17 @@ import { useForm } from "react-hook-form";
 import { CreateCategory } from "../_actions/categories";
 import { Category } from "@prisma/client";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 
 interface CreateCategoryDialogProps {
   type: TransactionType;
+  successCallback: (category: Category) => void;
 }
 
-const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({ type }) => {
+const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({
+  type,
+  successCallback,
+}) => {
   const [open, setOpen] = useState<boolean>(false);
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
@@ -56,6 +61,7 @@ const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({ type }) => {
   });
 
   const queryClient = useQueryClient();
+  const theme = useTheme();
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateCategory,
@@ -69,6 +75,8 @@ const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({ type }) => {
       toast.success(`Category ${data.name} created successfully 🎉`, {
         id: "create-category",
       });
+
+      successCallback(data);
 
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
@@ -134,10 +142,14 @@ const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({ type }) => {
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} />
+                        <Input
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="Category name"
+                        />
                       </FormControl>
                       <FormDescription>
-                        Transaction Description (optional){" "}
+                        This is how your category will appear in the app
                       </FormDescription>
                     </FormItem>
                   )}
@@ -180,6 +192,7 @@ const CreateCategoryDialog: FC<CreateCategoryDialogProps> = ({ type }) => {
                           <PopoverContent className=" w-full">
                             <Picker
                               data={data}
+                              theme={theme.resolvedTheme}
                               onEmojiSelect={(e: { native: string }) => {
                                 field.onChange(e.native);
                               }}

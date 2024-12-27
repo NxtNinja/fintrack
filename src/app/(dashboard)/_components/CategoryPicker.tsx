@@ -14,16 +14,17 @@ import { TransactionType } from "@/lib/types";
 import { Category } from "@prisma/client";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { useQuery } from "@tanstack/react-query";
-import { FC, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import CreateCategoryDialog from "./CreateCategoryDialog";
-import { Check } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CategoryPickerProps {
   type: TransactionType;
+  onChange: (value: string) => void;
 }
 
-const CategoryPicker: FC<CategoryPickerProps> = ({ type }) => {
+const CategoryPicker: FC<CategoryPickerProps> = ({ type, onChange }) => {
   const [value, setValue] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const { data } = useQuery({
@@ -35,6 +36,22 @@ const CategoryPicker: FC<CategoryPickerProps> = ({ type }) => {
   const selectedCategory = data?.find(
     (category: Category) => category.name === value
   );
+
+  const onSuccessCallback = useCallback(
+    (category: Category) => {
+      setValue(category.name);
+      setOpen((prev) => !prev);
+    },
+    [setValue, setOpen]
+  );
+
+  useEffect(() => {
+    if (!value) {
+      return;
+    }
+
+    onChange(value);
+  }, [onChange, value]);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -49,12 +66,18 @@ const CategoryPicker: FC<CategoryPickerProps> = ({ type }) => {
           ) : (
             "Select category"
           )}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command onSubmit={(e) => e.preventDefault()}>
           <CommandInput placeholder="Search categories" />
-          <CreateCategoryDialog type={type} />
+
+          {/* Create category */}
+          <CreateCategoryDialog
+            type={type}
+            successCallback={onSuccessCallback}
+          />
           <CommandEmpty>
             <p className="">No categories found</p>
             <p className="text-xs text-muted-foreground">
@@ -66,7 +89,7 @@ const CategoryPicker: FC<CategoryPickerProps> = ({ type }) => {
               {data &&
                 data?.map((category: Category) => (
                   <CommandItem
-                    key={category.userId}
+                    key={category.name}
                     onSelect={() => {
                       setValue(category.name);
                       setOpen((prev) => !prev);
